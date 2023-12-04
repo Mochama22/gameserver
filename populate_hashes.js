@@ -1,19 +1,22 @@
-var async = require('async');
-var db = require('./server/database');
-var lib = require('./server/lib');
-var _ = require('lodash');
+// bustabit_gameserver_custom/populate_hashes.js
+
+const async = require('async');
+const db = require('./server/database');
+const lib = require('./server/lib');
+const _ = require('lodash');
 
 var offset = 1e6;
 
 var games = 1e6;  // You might want to make this 10M for a prod setting..
 var game = games;
-var serverSeed = 'DO NOT USE THIS SEED';
+
+// Use the server seed provided as a command-line argument, or use a default seed
+var serverSeed = process.argv[2] || 'DO NOT USE THIS SEED';
 
 function loop(cb) {
     var parallel = Math.min(game, 1000);
 
     var inserts = _.range(parallel).map(function() {
-
         return function(cb) {
             serverSeed = lib.genGameHash(serverSeed);
             game--;
@@ -42,9 +45,6 @@ function loop(cb) {
     });
 }
 
-
 loop(function() {
-
     console.log('Finished with serverseed: ', serverSeed);
-
 });
